@@ -1,0 +1,12 @@
+[Unit]
+Description=Watch for button press on configured pin and toggle screen backlight
+Before=
+After=network.target
+
+[Service]
+ExecStart=/opt/button/button 26
+Restart=on-abort
+StandardOutput=journal
+
+[Install]
+WantedBy=multi-user.target
