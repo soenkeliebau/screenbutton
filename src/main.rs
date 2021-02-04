@@ -1,5 +1,5 @@
-use anyhow::Error;
 use anyhow::anyhow;
+use anyhow::Error;
 use std::convert::TryFrom;
 use std::fmt;
 use std::fs;
@@ -41,9 +41,7 @@ impl ScreenState {
 }
 
 fn check_screen_state() -> Result<ScreenState, Error> {
-    ScreenState::try_from(fs::read_to_string(
-        STATE_FILE,
-    )?)
+    ScreenState::try_from(fs::read_to_string(STATE_FILE)?)
 }
 
 fn flip_screen_state() -> Result<(), anyhow::Error> {
@@ -65,13 +63,15 @@ fn screen_off() -> Result<(), anyhow::Error> {
 }
 
 fn main() {
+    match check_screen_state() {
+        Ok(state) => println!("Current state: {}", state),
+        Err(e) => println!("Error: {}", e),
+    };
 
-    for _ in 0..4 {
-        match check_screen_state() {
-            Ok(state) => println!("Current state: {}", state),
-            Err(e) => println!("Error: {}", e),
-        };
-        println!("Flipping state..");
-        flip_screen_state().unwrap_or_else(|e| println!("Error occured when setting state: [{}]", e));
+    print!("Flipping state..");
+
+    match flip_screen_state() {
+        Ok(()) => println!("done!"),
+        Err(e) => println!("Error occured when setting state: [{}]", e),
     }
 }
