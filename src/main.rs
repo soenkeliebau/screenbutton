@@ -1,12 +1,13 @@
 use anyhow::anyhow;
 use anyhow::Error;
-use rppal::gpio::{Gpio, InputPin, Trigger};
+use rppal::gpio::{Gpio, InputPin, Level, Trigger};
 use std::convert::TryFrom;
 use std::fs;
 use std::process::exit;
 use std::str::FromStr;
 use std::time::Instant;
 use std::{env, fmt};
+use system_shutdown::shutdown;
 use tokio::signal::unix::{signal, SignalKind};
 
 #[derive(Debug)]
@@ -19,6 +20,7 @@ const ON_VALUE: &str = "0\n";
 const OFF_VALUE: &str = "1\n";
 const STATE_FILE: &str = "/sys/class/backlight/rpi_backlight/bl_power";
 const TRIGGER_DELAY_MS: u128 = 1000;
+const LONG_PUSH_DURATION_MS: u128 = 2000;
 
 impl fmt::Display for ScreenState {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
@@ -128,13 +130,36 @@ async fn main() {
         .into_input_pullup();
 
     let mut last_triggered = Instant::now();
+    let mut push_start = Instant::now();
 
     // Register callback to be executed when the button is pushed
-    match pin.set_async_interrupt(Trigger::FallingEdge, move |_level| {
-        if last_triggered.elapsed().as_millis() > TRIGGER_DELAY_MS {
-            println!("Recognized button press, flipping screen state.");
-            last_triggered = Instant::now();
-            check_and_flip();
+    match pin.set_async_interrupt(Trigger::Both, move |level| {
+        if level == Level::Low {
+            // Pin is pulled up, so high is the normal state, button must have been pushed
+            push_start = Instant::now();
+            if last_triggered.elapsed().as_millis() > TRIGGER_DELAY_MS {
+                println!("Recognized button press, flipping screen state.");
+                last_triggered = Instant::now();
+                check_and_flip();
+            }
+        } else {
+            // Button was released, check how long it was pressed
+            if push_start.elapsed().as_millis() > LONG_PUSH_DURATION_MS {
+                // Button was pushed long enough to count as a long press
+                println!("Recognized long button press, shutting down Raspberry!");
+                // Turn on the screen so we can see it is shutting down
+                if let Err(e) = screen_on() {
+                    println!(
+                        "Error turning on screen before triggering shutdown: [{}].",
+                        e
+                    );
+                };
+
+                match shutdown() {
+                    Ok(()) => println!("Successfully triggered shutdown!"),
+                    Err(e) => println!("Shutdown failed due to: [{}]", e),
+                };
+            }
         }
     }) {
         Ok(()) => println!(
