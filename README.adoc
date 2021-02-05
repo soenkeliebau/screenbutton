@@ -1,3 +1,4 @@
+image::https://github.com/soenkeliebau/screenbutton/workflows/Rust/badge.svg[]
 = Screenbutton
 
 == Purpose
