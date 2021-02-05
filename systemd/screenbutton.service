@@ -1,10 +1,10 @@
 [Unit]
-Description=Watch for button press on configured pin and toggle screen backlight
+Description=Screen Button Toggle
 Before=
 After=network.target
 
 [Service]
-ExecStart=/opt/button/button 26
+ExecStart=/opt/screenbutton/screenbutton 26
 Restart=on-abort
 StandardOutput=journal
 

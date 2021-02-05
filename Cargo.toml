@@ -1,5 +1,5 @@
 [package]
-name = "button"
+name = "screenbutton"
 version = "0.1.0"
 authors = ["Sönke Liebau <soenke.liebau@gmail.com>"]
 edition = "2018"
@@ -9,4 +9,4 @@ edition = "2018"
 [dependencies]
 anyhow = "1.0"
 rppal = "0.11"
-tokio = { version = "1.0", features=["time", "macros", "rt-multi-thread", "signal"]}
+tokio = { version = "1.0", features=["macros", "rt-multi-thread", "signal"]}

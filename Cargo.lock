@@ -13,15 +13,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "cdb031dd78e28731d87d56cc8ffef4a8f36ca26c38fe2de700543e627f8a464a"
 
 [[package]]
-name = "button"
-version = "0.1.0"
-dependencies = [
- "anyhow",
- "rppal",
- "tokio",
-]
-
-[[package]]
 name = "cfg-if"
 version = "1.0.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -137,6 +128,15 @@ checksum = "137dbba1fb867daa27cda4c3cd6a11bca5bb5a1551f034cf9319b994846ddbe1"
 dependencies = [
  "lazy_static",
  "libc",
+]
+
+[[package]]
+name = "screenbutton"
+version = "0.1.0"
+dependencies = [
+ "anyhow",
+ "rppal",
+ "tokio",
 ]
 
 [[package]]

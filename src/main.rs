@@ -84,11 +84,12 @@ fn check_and_flip() {
 }
 
 fn cleanup(mut pin: InputPin, signal: &str, pin_number: u8) {
-    println!("Got [{}], cleaning up and shutting down.", signal);
+    println!("Got [{}], cleaning up and shutting down...", signal);
     match pin.clear_async_interrupt() {
         Ok(()) => println!("Successfully cleared interrupt on pin [{}]", pin_number),
         Err(e) => println!("Error clearing interrupt on pin [{}]: [{}]", pin_number, e),
     }
+    println!("== Button stopped ==")
 }
 
 #[tokio::main]
@@ -148,6 +149,8 @@ async fn main() {
 
     // Do nothing, just need to keep the program alive to wait for the callback or until
     // we are interrupted
+    // We handle all signals the same and shut down orderly by cleaning up our interrupt
+    // on the pin
     tokio::select! {
     _ = sigint.recv() => cleanup(pin, "SIGINT", pin_number),
     _ = sighup.recv() => cleanup(pin, "SIGHUP", pin_number),
