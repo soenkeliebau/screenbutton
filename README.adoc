@@ -1,0 +1,39 @@
+= Screenbutton
+
+== Purpose
+This project allows you to add a button to your Raspberry PI which performs the following two functions:
+
+- Switch backlight for thescreen on/off on a short press
+- Shutdown Raspberry on a long press (2 seconds or more)
+
+== Installation
+Simply download the binary from the https://github.com/soenkeliebau/screenbutton/releases[releases] page to your Raspberry.
+
+== Usage
+=== Manual start
+The tool takes one parameter, which is the BCM number of the pin that your button is connected to.
+For more details on this you can for example refer to https://pinout.xyz/[pinout.xyz/], but there are plenty of pages out there on this topic.
+
+For pin 26 you can start the tool with:
+
+    ./screenbutton 26
+
+Screenbutton has to run with root rights as no one else is authorized to write to the file controlling the screens backlight.
+
+=== Setting up as a service
+I have provided an example systemd unit file that can be used to have this file executed at startup and keep running.
+
+You can find this in the `systemd` folder of the respository.
+
+NOTE:  I have made two assumptions when writting the service file, please read these carefully!
+
+. This service definiton expects to find the screenbutton binary in `/opt/screenbutton/`, if you prefer to use a different location you will need to adjust this.
+. The pin is configured to 26
+
+To install the service copy the file to /etc/systemd/system/ on your Raspberry and run the following commands:
+
+    systemctl daemon-reload
+    systemctl start screenbutton
+    systemctl enable screenbutton
+
+After you did this the service should start at every boot.
